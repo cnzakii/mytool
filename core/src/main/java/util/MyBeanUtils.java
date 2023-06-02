@@ -3,7 +3,6 @@ package util;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.cglib.beans.BeanCopier;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
@@ -12,7 +11,7 @@ import java.util.Arrays;
 /**
  * Bean工具类
  * <p>
- * 本类是对Spring BeanUtils的进一步封装
+ * 本类是对Spring{@link BeanUtils}的进一步封装
  * </p>
  *
  * @author Zaki

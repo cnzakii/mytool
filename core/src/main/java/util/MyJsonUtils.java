@@ -1,13 +1,15 @@
 package util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * json工具类
  * <p>
- * 本类是对Jackson工具库的进一步封装
+ * 本类是对Jackson的进一步封装
  * </p>
  *
  * @author Zaki
@@ -16,6 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  **/
 public class MyJsonUtils {
 
+    /**
+     * ObjectMapper对象
+     */
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -26,7 +31,7 @@ public class MyJsonUtils {
      * @param <T> bean数据类型
      * @return Json 字符串
      */
-    public static <T> String toJsonStr(T t) {
+    public static <T> String getJsonStr(T t) {
         String json;
         try {
             json = objectMapper.writeValueAsString(t);
@@ -88,5 +93,25 @@ public class MyJsonUtils {
         return bean;
     }
 
-
+    /**
+     * 根据key值从json字符串中获取对应value，并转成对应Java对象
+     *
+     * @param json          json字符串
+     * @param key           json中的键
+     * @param typeReference 类型引用对象，用于指定要解析的目标类型
+     * @return Java 对象
+     */
+    public static <T> T getValueByKey(String json, String key, TypeReference<T> typeReference) {
+        T bean = null;
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            JsonNode node = root.get(key);
+            if (node != null) {
+                bean = objectMapper.readValue(node.traverse(), typeReference);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
+        return bean;
+    }
 }

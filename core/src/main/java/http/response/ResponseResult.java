@@ -1,7 +1,8 @@
-package http;
+package http.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import http.ResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

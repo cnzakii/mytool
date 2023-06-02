@@ -1,9 +1,11 @@
 package util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import entity.Person;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * MyJsonUtils 测试类
@@ -25,7 +27,7 @@ public class TestMyJsonUtils {
     public void testToJsonStr() {
         Person person = new Person("myTool", 1, new String[]{"中国", "福建"});
 
-        String jsonStr = MyJsonUtils.toJsonStr(person);
+        String jsonStr = MyJsonUtils.getJsonStr(person);
         System.out.println(jsonStr);
     }
 
@@ -47,11 +49,16 @@ public class TestMyJsonUtils {
         String[] address = MyJsonUtils.getValueByKey(json, "address", String[].class);
         System.out.println(Arrays.toString(address));
 
+        List<String> addressList = MyJsonUtils.getValueByKey(json, "address", new TypeReference<>() {
+        });
+        System.out.println(addressList);
+
         Person person = MyJsonUtils.getValueByKey(beanJson, "Person", Person.class);
         System.out.println(person);
 
         Person person2 = MyJsonUtils.getValueByKey(beanJson, Person.class);
         System.out.println(person2);
+
 
     }
 
