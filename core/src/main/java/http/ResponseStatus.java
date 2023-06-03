@@ -4,8 +4,6 @@ package http;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
-
 /**
  * 常见状态码枚举类
  *
