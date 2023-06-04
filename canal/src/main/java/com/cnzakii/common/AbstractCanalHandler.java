@@ -1,4 +1,4 @@
-package common;
+package com.cnzakii.common;
 
 import java.util.List;
 import java.util.stream.IntStream;

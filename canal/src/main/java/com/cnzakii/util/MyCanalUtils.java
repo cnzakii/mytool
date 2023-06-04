@@ -1,10 +1,14 @@
-package util;
+package com.cnzakii.util;
 
-import annotation.CanalTable;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.cnzakii.annotation.CanalTable;
+import com.cnzakii.common.ApplicationContextProvider;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
-import spring.ApplicationContextProvider;
+import util.MyBeanUtils;
+import util.MyCollUtils;
+import util.MyJsonUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -37,12 +41,13 @@ public class MyCanalUtils {
      * @return 旧数据集合
      */
     public static <T> List<T> getOldDataList(String json, Class<T> clazz) {
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, clazz);
 
         List<T> list = getNewDataList(json, clazz);
-        List<T> oldList = MyJsonUtils.getValueByKey(json, "old", new TypeReference<>() {
-        });
+        List<T> oldList = MyJsonUtils.getValueByKey(json, "old", type);
 
-        if (MyCollUtils.hasEmpty(list,oldList)) {
+        if (MyCollUtils.hasEmpty(list, oldList)) {
             throw new RuntimeException("List is empty");
         }
         if (list.size() != oldList.size()) {
@@ -65,11 +70,9 @@ public class MyCanalUtils {
      * @return 新数据集合
      */
     public static <T> List<T> getNewDataList(String json, Class<T> clazz) {
-        if (!clazz.isArray()) {
-            throw new RuntimeException("Class Type Must Be Array");
-        }
-        return MyJsonUtils.getValueByKey(json, "data", new TypeReference<>() {
-        });
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, clazz);
+        return MyJsonUtils.getValueByKey(json, "data", type);
     }
 
     /**

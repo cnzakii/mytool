@@ -1,4 +1,4 @@
-package annotation;
+package com.cnzakii.annotation;
 
 
 import java.lang.annotation.*;

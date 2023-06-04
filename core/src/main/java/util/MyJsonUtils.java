@@ -1,9 +1,21 @@
 package util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import constant.TimeConstants;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -22,6 +34,23 @@ public class MyJsonUtils {
      * ObjectMapper对象
      */
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_TIME_FORMAT)));
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_FORMAT)));
+        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_TIME_FORMAT)));
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_TIME_FORMAT)));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_FORMAT)));
+        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_TIME_FORMAT)));
+
+        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule());
+    }
 
 
     /**
@@ -96,18 +125,18 @@ public class MyJsonUtils {
     /**
      * 根据key值从json字符串中获取对应value，并转成对应Java对象
      *
-     * @param json          json字符串
-     * @param key           json中的键
-     * @param typeReference 类型引用对象，用于指定要解析的目标类型
+     * @param json json字符串
+     * @param key  json中的键
+     * @param type 类型引用对象，用于指定要解析的目标类型
      * @return Java 对象
      */
-    public static <T> T getValueByKey(String json, String key, TypeReference<T> typeReference) {
+    public static <T> T getValueByKey(String json, String key, JavaType type) {
         T bean = null;
         try {
             JsonNode root = objectMapper.readTree(json);
             JsonNode node = root.get(key);
             if (node != null) {
-                bean = objectMapper.readValue(node.traverse(), typeReference);
+                bean = objectMapper.readValue(node.traverse(), type);
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getLocalizedMessage());

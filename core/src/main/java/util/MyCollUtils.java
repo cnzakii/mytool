@@ -29,9 +29,9 @@ public class MyCollUtils {
      * 检查传入的所有集合是否存在空集合
      *
      * @param collections Collection<?>集合
-     * @return 只要有一个为空，则返回false
+     * @return 只要有一个为空，则返回ture
      */
     public static boolean hasEmpty(Collection<?>... collections) {
-        return Arrays.stream(collections).noneMatch(MyCollUtils::isEmpty);
+        return Arrays.stream(collections).anyMatch(MyCollUtils::isEmpty);
     }
 }
