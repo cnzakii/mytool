@@ -1,21 +1,11 @@
-package util;
+package json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import constant.TimeConstants;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -31,27 +21,26 @@ import java.time.format.DateTimeFormatter;
 public class MyJsonUtils {
 
     /**
-     * ObjectMapper对象
+     * ObjectMapper 单例对象
      */
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
+        // 属性命名策略设置为将驼峰式命名转换为下划线分隔的命名
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_TIME_FORMAT)));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_FORMAT)));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_TIME_FORMAT)));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_TIME_FORMAT)));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_DATE_FORMAT)));
-        javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(TimeConstants.DEFAULT_TIME_FORMAT)));
-
-        objectMapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule());
+        // 注册时间模块, 支持支持jsr310, 即新的时间类(java.time包下的时间类)
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
+    /**
+     * 获取 objectMapper对象
+     *
+     * @return ObjectMapper
+     */
+    public static ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
 
     /**
      * 将java对象转换成Json字符串
@@ -83,7 +72,7 @@ public class MyJsonUtils {
         try {
             bean = objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert JSON string to object");
+            throw new RuntimeException("Failed to convert JSON string to object, The reason is " + e.getLocalizedMessage());
         }
         return bean;
     }

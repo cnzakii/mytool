@@ -1,4 +1,4 @@
-package util;
+package bean;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;

@@ -1,8 +1,10 @@
 package util;
 
 import entity.Person;
+import json.MyJsonUtils;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 /**
@@ -47,13 +49,16 @@ public class TestMyJsonUtils {
         String[] address = MyJsonUtils.getValueByKey(json, "address", String[].class);
         System.out.println(Arrays.toString(address));
 
-
-
         Person person = MyJsonUtils.getValueByKey(beanJson, "Person", Person.class);
         System.out.println(person);
 
         Person person2 = MyJsonUtils.getValueByKey(beanJson, Person.class);
         System.out.println(person2);
+
+
+        String datetime = "{\"datetime\":\"2023-06-05 15:17:11.117\"}";
+        LocalDateTime value = MyJsonUtils.getValueByKey(datetime, "datetime", LocalDateTime.class);
+        System.out.println(value);
 
 
     }
