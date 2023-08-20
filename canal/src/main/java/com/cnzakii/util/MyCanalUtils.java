@@ -1,12 +1,12 @@
 package com.cnzakii.util;
 
-import bean.MyBeanUtils;
-import collection.MyCollUtils;
+import util.bean.MyBeanUtils;
+import util.collection.MyCollUtils;
 import com.cnzakii.annotation.CanalTable;
 import com.cnzakii.common.ApplicationContextProvider;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import json.MyJsonUtils;
+import util.json.MyJsonUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 

@@ -1,8 +1,8 @@
 package util;
 
 import entity.Person;
-import json.MyJsonUtils;
 import org.junit.Test;
+import util.json.MyJsonUtils;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
