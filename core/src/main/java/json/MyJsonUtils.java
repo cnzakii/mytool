@@ -1,11 +1,12 @@
 package json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.*;
+import io.micrometer.common.util.StringUtils;
+import lombok.Getter;
+
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * @version 1.0
  * @since 2023-06-01
  **/
+@Getter
 public class MyJsonUtils {
 
     /**
@@ -26,20 +28,14 @@ public class MyJsonUtils {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
-        // 属性命名策略设置为将驼峰式命名转换为下划线分隔的命名
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        // 忽略空Bean转json的错误
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
-        // 注册时间模块, 支持支持jsr310, 即新的时间类(java.time包下的时间类)
-        objectMapper.registerModule(new JavaTimeModule());
-    }
+        // 忽略未知属性，防止json字符串中存在，java对象中不存在对应属性的情况出现错误
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    /**
-     * 获取 objectMapper对象
-     *
-     * @return ObjectMapper
-     */
-    public static ObjectMapper getObjectMapper() {
-        return objectMapper;
+        //解决时间格式等一系列问题
+        objectMapper.findAndRegisterModules();
     }
 
     /**
@@ -59,6 +55,30 @@ public class MyJsonUtils {
         return json;
     }
 
+    /**
+     * 解析Json字符串，反序列化为Map集合
+     *
+     * @param json   json字符串
+     * @param kClazz key的Java类型
+     * @param vClazz value的Java类型
+     * @return map
+     */
+    public static <K, V> Map<K, V> getMap(String json, Class<K> kClazz, Class<V> vClazz) {
+        if (StringUtils.isBlank(json) || kClazz == null || vClazz == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<K, V> map;
+        try {
+            map = objectMapper.readValue(json, objectMapper.getTypeFactory().constructParametricType(Map.class, kClazz, vClazz));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
+
+
+        return map;
+    }
+
 
     /**
      * 将json字符串转换成对应的java对象
@@ -67,7 +87,7 @@ public class MyJsonUtils {
      * @param clazz 目标Java类型
      * @return Java 对象
      */
-    public static <T> T getValue(String json, Class<T> clazz) {
+    public static <T> T parseObject(String json, Class<T> clazz) {
         T bean;
         try {
             bean = objectMapper.readValue(json, clazz);
@@ -85,8 +105,8 @@ public class MyJsonUtils {
      * @param clazz 目标Java类型
      * @return Java 对象
      */
-    public static <T> T getValueByKey(String json, Class<T> clazz) {
-        return getValueByKey(json, clazz.getSimpleName(), clazz);
+    public static <T> T parseObjectByKey(String json, Class<T> clazz) {
+        return parseObjectByKey(json, clazz.getSimpleName(), clazz);
     }
 
     /**
@@ -97,7 +117,7 @@ public class MyJsonUtils {
      * @param clazz 目标Java类型
      * @return Java 对象
      */
-    public static <T> T getValueByKey(String json, String key, Class<T> clazz) {
+    public static <T> T parseObjectByKey(String json, String key, Class<T> clazz) {
         T bean = null;
         try {
             JsonNode root = objectMapper.readTree(json);
@@ -116,10 +136,10 @@ public class MyJsonUtils {
      *
      * @param json json字符串
      * @param key  json中的键
-     * @param type 类型引用对象，用于指定要解析的目标类型
+     * @param type 类型引用对象，用于指定要解析的目标类型,主要针对List集合等
      * @return Java 对象
      */
-    public static <T> T getValueByKey(String json, String key, JavaType type) {
+    public static <T> T parseObjectByKey(String json, String key, JavaType type) {
         T bean = null;
         try {
             JsonNode root = objectMapper.readTree(json);

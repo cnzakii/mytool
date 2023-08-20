@@ -45,7 +45,7 @@ public class MyCanalUtils {
         JavaType type = mapper.getTypeFactory().constructParametricType(List.class, clazz);
 
         List<T> list = getNewDataList(json, clazz);
-        List<T> oldList = MyJsonUtils.getValueByKey(json, "old", type);
+        List<T> oldList = MyJsonUtils.parseObjectByKey(json, "old", type);
 
         if (MyCollUtils.hasEmpty(list, oldList)) {
             throw new RuntimeException("List is empty");
@@ -72,7 +72,7 @@ public class MyCanalUtils {
     public static <T> List<T> getNewDataList(String json, Class<T> clazz) {
         ObjectMapper mapper = new ObjectMapper();
         JavaType type = mapper.getTypeFactory().constructParametricType(List.class, clazz);
-        return MyJsonUtils.getValueByKey(json, "data", type);
+        return MyJsonUtils.parseObjectByKey(json, "data", type);
     }
 
     /**
@@ -82,7 +82,7 @@ public class MyCanalUtils {
      * @return 表名
      */
     public static String getTable(String json) {
-        return MyJsonUtils.getValueByKey(json, "table", String.class);
+        return MyJsonUtils.parseObjectByKey(json, "table", String.class);
     }
 
 
@@ -94,7 +94,7 @@ public class MyCanalUtils {
      * @return INSERT UPDATE DELETE
      */
     public static String getType(String json) {
-        return MyJsonUtils.getValueByKey(json, "type", String.class);
+        return MyJsonUtils.parseObjectByKey(json, "type", String.class);
     }
 
 

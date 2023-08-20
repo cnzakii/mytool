@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * MyJsonUtils 测试类
@@ -33,31 +34,34 @@ public class TestMyJsonUtils {
 
     @Test
     public void testGetValue() {
-        Person bean = MyJsonUtils.getValue(json, Person.class);
+        Person bean = MyJsonUtils.parseObject(json, Person.class);
         System.out.println(bean);
     }
 
 
     @Test
     public void testGetValueByKey() {
-        String name = MyJsonUtils.getValueByKey(json, "name", String.class);
+        String name = MyJsonUtils.parseObjectByKey(json, "name", String.class);
         System.out.println(name);
 
-        Integer age = MyJsonUtils.getValueByKey(json, "age", Integer.class);
+        Integer age = MyJsonUtils.parseObjectByKey(json, "age", Integer.class);
         System.out.println(age);
 
-        String[] address = MyJsonUtils.getValueByKey(json, "address", String[].class);
+        String[] address = MyJsonUtils.parseObjectByKey(json, "address", String[].class);
         System.out.println(Arrays.toString(address));
 
-        Person person = MyJsonUtils.getValueByKey(beanJson, "Person", Person.class);
+        Person person = MyJsonUtils.parseObjectByKey(beanJson, "Person", Person.class);
         System.out.println(person);
 
-        Person person2 = MyJsonUtils.getValueByKey(beanJson, Person.class);
+        Person person2 = MyJsonUtils.parseObjectByKey(beanJson, Person.class);
         System.out.println(person2);
 
+        Map<String,Object> map = MyJsonUtils.getMap(beanJson,String.class,Object.class);
+        System.out.println(map);
 
-        String datetime = "{\"datetime\":\"2023-06-05 15:17:11.117\"}";
-        LocalDateTime value = MyJsonUtils.getValueByKey(datetime, "datetime", LocalDateTime.class);
+
+        String datetime = "{\"datetime\":\"2023-06-05T15:17:11.117\"}";
+        LocalDateTime value = MyJsonUtils.parseObjectByKey(datetime, "datetime", LocalDateTime.class);
         System.out.println(value);
 
 
